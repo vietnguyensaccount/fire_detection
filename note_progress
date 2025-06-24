@@ -1,0 +1,45 @@
+real fire dataset
+smoke detection camera
+flir lepton 3.5 tunnel
+pi camera 3.0
+os
+
+Software: AI + Portal Apps + Mobile Apps
+- AI: Streaming, Detect Fire, Throw Events
+	+ Model AI (Fire Detection)	 
+	+ Pipeline System: Extract Frames (OpenCV), Fire Detection (Ultralytics), Throw Events (Print On Screen)
+- Portal Apps: Configure Problem, Cameras, Receiving Events
+- Mobile Apps: Receiving Events
+
+Version 1: On Server + Anaconda Environment (3 days)
+- Task 1: Find Ultralytics Model to detect fire online
+- Task 2: Code a system to read images from mp4 video using OpenCV to show on screen
+- Task 3: Code script to detect fire from an image, show bounding boxes
+- Task 4: Combine Task 2 and Task 3, complete a system using OpenCV, fire detection on each frame, show on screen + print on terminal
+
+Version 2: On Server + Anaconda Environment (1 week)
+- Task 1: Collect actual fire data from factory, label data and train data, Model 2
+- Task 2: Apply model into the system of version 1
+- Task 3: Build post processing logic for fire detection
+- Task 4: Build system to throw events using public online MQTT server (Download app to supervise events on MQTT)
+
+Version 3: Build Portal App using Streamlite (1 week)
+- Task 1: Write communication service for configure thresholds and camera urls (using HTTP)
+- Task 2: Build feature to configure thresholds in real time, connect API (Https) with AI system for web
+- Task 3: Build feature to configure url of AI system for web, connect API (Https) with AI system
+- Task 4: Build feature to receive events and notify, connect with MQTT of AI system
+
+Version 4: Build Mobile App using Kivy (1 week)
+- Task 1: Build feature to receive events and notify, connect with MQTT of AI system
+- Task 2: Deploy and build app
+
+Version 5: Deploy on Jetson Nano (3 days)
+- Task 1: Environment Settings on Jetson Nano (MQTT, Ultralytics, OpenCV)
+- Task 2: Deploy fire detection system on Jetson Nano, using pt model file
+- Task 3: Connect and test with real camera
+
+Version 6: Collect data and train model
+
+Version 7: Convert model to tensor
+
+BLcpKpeQlixeji2463@calorpg.com
