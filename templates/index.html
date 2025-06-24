@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fire Alert UI</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin: 20px; }
+        img { max-width: 80%; height: auto; margin: 10px 0; }
+        .level { font-size: 1.2em; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Fire And Smoke Detection Alert</h1>
+    {% if data.image_path %}
+        <div>
+            <img src="{{ url_for('static', filename=data.image_path.split('/')[-1]) }}" alt="Snapshot">
+        </div>
+        <div class="level">Fire Level: {{ data.fire_level }}/10</div>
+        <div class="level">Smoke Level: {{ data.smoke_level }}/10</div>
+        <div class="level">Detected At: {{ data.timestamp }}</div>
+    {% else %}
+        <p>No detection data received yet.</p>
+    {% endif %}
+    <div>
+        <button onclick="sendResponse('Real Fire')">Real Fire 🔥</button>
+        <button onclick="sendResponse('Real Smoke')">Real Smoke 💨</button>
+        <button onclick="sendResponse('False Alarm')">False Alarm ❌</button>
+    </div>
+
+    <script>
+        function sendResponse(choice) {
+            fetch("/api/user_response", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ choice: choice })
+            }).then(res => res.json()).then(data => {
+                alert("Response submitted: " + choice);
+            });
+        }
+    </script>
+</body>
+</html>
