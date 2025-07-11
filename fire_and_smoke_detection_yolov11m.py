@@ -5,29 +5,29 @@ import os
 from collections import deque
 from ultralytics import YOLO
 
-# ====== CONFIG ======
-video_path = 'combined.mp4'
+
+video_path = 'sample_video.mp4'
 detections_json = 'detections.json'
-thumbnails_folder = 'images'
+thumbnails_folder = 'thumbnails'
 os.makedirs(thumbnails_folder, exist_ok=True)
 
 model = YOLO('yolov11m.pt')
 
-# ====== VIDEO SETUP ======
+
 cap = cv2.VideoCapture(video_path)
 if not cap.isOpened():
-    print("Error: Cannot open video")
+    print("❌ Error: Cannot open video.")
     exit()
 
-# ====== DETECTION LOGIC ======
+
 detection_history = deque()
 cooldown_until = 0
 last_detection_time = 0
 last_json_save_time = time.time()
 
-detection_records = []  # To save for JSON
+detection_records = []
 
-print("🔥 Starting Detection...")
+print("🔥 Detection started (optimized for NVIDIA Jetson / CUDA)...")
 
 try:
     while cap.isOpened():
@@ -37,11 +37,10 @@ try:
 
         current_time = time.time()
 
-        # Cooldown check
         if current_time < cooldown_until:
-            cv2.imshow('Cooldown Active', frame)
+            cv2.imshow('Fire Detection (Cooldown)', frame)
         else:
-            # Detect every second
+            # Detect once every second
             if current_time - last_detection_time >= 1:
                 results = model(frame, verbose=False)
                 detections = results[0].boxes
@@ -69,26 +68,24 @@ try:
                     detection_records.append({
                         "status": detected_label,
                         "timestamp": timestamp,
-                        "thumbnail": thumb_path
+                        "thumbnail": thumb_filename
                     })
 
                     print(f"🔥 Detected {detected_label} at {timestamp}")
 
-                # Clean old detections >10 seconds
                 while detection_history and current_time - detection_history[0] > 10:
                     detection_history.popleft()
 
-                # Alert Trigger
+
                 if len(detection_history) >= 3:
-                    print("🚨 ALERT! Detected 3 times in 10 seconds!")
-                    cooldown_until = current_time + 30  # 30s pause
+                    print("🚨 ALERT! Detected 3 times in 10 seconds! Cooling down for 30s...")
+                    cooldown_until = current_time + 30
                     detection_history.clear()
 
                 last_detection_time = current_time
 
             cv2.imshow('Fire Detection', frame)
 
-        # Save JSON every minute
         if current_time - last_json_save_time >= 60:
             with open(detections_json, 'w') as f:
                 json.dump(detection_records, f, indent=2)
@@ -99,12 +96,12 @@ try:
             break
 
 except KeyboardInterrupt:
-    print("Stopped by user.")
+    print("Interrupted by user.")
 
 finally:
     cap.release()
     cv2.destroyAllWindows()
-    # Final save
+    
     with open(detections_json, 'w') as f:
         json.dump(detection_records, f, indent=2)
     print(f"📄 Final detections saved to {detections_json}")
