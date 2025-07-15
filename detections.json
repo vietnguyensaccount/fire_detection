@@ -1,0 +1,47 @@
+[
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:16:21",
+    "thumbnail": "images\\2025-07-15_09-16-21.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:16:22",
+    "thumbnail": "images\\2025-07-15_09-16-22.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:16:24",
+    "thumbnail": "images\\2025-07-15_09-16-24.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:16:54",
+    "thumbnail": "images\\2025-07-15_09-16-54.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:16:55",
+    "thumbnail": "images\\2025-07-15_09-16-55.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:16:56",
+    "thumbnail": "images\\2025-07-15_09-16-56.jpg"
+  },
+  {
+    "status": "smoke",
+    "timestamp": "2025-07-15_09:17:26",
+    "thumbnail": "images\\2025-07-15_09-17-26.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:17:27",
+    "thumbnail": "images\\2025-07-15_09-17-27.jpg"
+  },
+  {
+    "status": "fire",
+    "timestamp": "2025-07-15_09:17:28",
+    "thumbnail": "images\\2025-07-15_09-17-28.jpg"
+  }
+]
