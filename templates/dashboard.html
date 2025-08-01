@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fire Detection Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      color: white;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #142f52;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .sidebar a:hover {
+      background-color: #1e3c72;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .main-content h2 {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid white;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #1e3c72;
+    }
+
+    img {
+      border-radius: 8px;
+      max-height: 160px;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🔥 Fire AI</h2>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/camera">Cameras</a>
+    <a href="/events">Events</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>Welcome, {{ session['username'] }}</h2>
+
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Timestamp</th>
+        <th>Thumbnail</th>
+      </tr>
+      {% for item in detections %}
+      <tr>
+        <td>{{ item.status }}</td>
+        <td>{{ item.timestamp }}</td>
+        <td>
+          <img src="/thumbnails/{{ item.thumbnail }}" alt="Thumbnail">
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</body>
+</html>
