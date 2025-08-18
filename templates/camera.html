@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Camera Settings</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #142f52;
+      padding: 20px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .sidebar a:hover {
+      background-color: #1e3c72;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      color: white;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+      color: white;
+    }
+
+    .actions a {
+      margin-right: 10px;
+      text-decoration: none;
+      color: #add8e6;
+      font-weight: bold;
+    }
+
+    .actions a:hover {
+      text-decoration: underline;
+    }
+
+    .add-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1e3c72;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .add-btn:hover {
+      background-color: #16315b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>🔥 Fire AI</h2>
+    <a href="/events">Events</a>
+    <a href="/camera">Cameras</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <h2>Camera Settings</h2>
+    <a href="/camera/add" class="add-btn">+ Add Camera</a>
+
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Edit</th><th>Start</th><th>Pause</th><th>Stop</th><th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cam in cameras %}
+        <tr>
+          <td>{{ cam['rtsp'] }}</td>
+            <td><input type="button" onclick="location.href='/camera/{{ cam['id'] }}/edit';" /></td>
+            <td><input type="button" onclick="location.href='/camera/{{ cam['id'] }}/start';" /></td>
+            <td><input type="button" onclick="location.href='/camera/{{ cam['id'] }}/pause';" /></td>
+            <td><input type="button" onclick="location.href='/camera/{{ cam['id'] }}/stop';" /></td>
+            <td><input type="button" onclick="location.href='/camera/{{ cam['id'] }}/delete';" /></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

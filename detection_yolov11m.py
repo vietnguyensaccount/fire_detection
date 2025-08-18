@@ -5,106 +5,117 @@ import os
 from collections import deque
 from ultralytics import YOLO
 
-# ====== CONFIG ======
-video_path = 'combined.mp4'
-detections_json = 'detections.json'
-thumbnails_folder = 'images'
-os.makedirs(thumbnails_folder, exist_ok=True)
+def ai_worker(video_path='rtsp://localhost:855/other',
+              detections_json='detections.json',
+              thumbnails_folder='thumbnails',
+              model_path='yolov11m.pt'):
 
-model = YOLO('yolov11m.pt')
+    os.makedirs(thumbnails_folder, exist_ok=True)
+    model = YOLO(model_path)
 
-# ====== VIDEO SETUP ======
-cap = cv2.VideoCapture(video_path)
-if not cap.isOpened():
-    print("Error: Cannot open video")
-    exit()
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print("Error: Cannot open video.")
+        return
 
-# ====== DETECTION LOGIC ======
-detection_history = deque()
-cooldown_until = 0
-last_detection_time = 0
-last_json_save_time = time.time()
+    detection_history = deque()
+    cooldown_until = 0
+    last_detection_time = 0
 
-detection_records = []  # To save for JSON
+    detection_records = []
 
-print(" Starting Detection...")
+    print("Detection started (AI Worker active)...")
 
-try:
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+    try:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        current_time = time.time()
+            current_time = time.time()
 
-        # Cooldown check
-        if current_time < cooldown_until:
-            cv2.imshow('Cooldown Active', frame)
-        else:
-            # Detect every second
-            if current_time - last_detection_time >= 1:
-                results = model(frame, verbose=False)
-                detections = results[0].boxes
-                labels = results[0].names
+            if current_time < cooldown_until:
+                resized_frame = cv2.resize(frame, (600, 300))
+                cv2.imshow('Fire Detection (Cooldown)', resized_frame)
+            else:
+                if current_time - last_detection_time >= 1:
+                    results = model(frame, verbose=False)
+                    detections = results[0].boxes
+                    labels = results[0].names
 
-                fire_smoke_detected = False
-                detected_label = None
+                    fire_smoke_detected = False
+                    detected_label = None
 
-                if detections is not None and len(detections) > 0:
-                    for box in detections:
-                        class_id = int(box.cls[0])
-                        label = labels[class_id].lower()
-                        if label in ['fire', 'smoke']:
-                            fire_smoke_detected = True
-                            detected_label = label
-                            break
+                    if detections is not None and len(detections) > 0:
+                        for box in detections:
+                            class_id = int(box.cls[0])
+                            label = labels[class_id].lower()
+                            if label in ['fire', 'smoke']:
+                                fire_smoke_detected = True
+                                detected_label = label
+                                break
 
-                if fire_smoke_detected:
-                    detection_history.append(current_time)
-                    timestamp = time.strftime('%Y-%m-%d_%H:%M:%S')
-                    thumb_filename = f"{timestamp.replace(':', '-')}.jpg"
-                    thumb_path = os.path.join(thumbnails_folder,thumb_filename)
-                    cv2.imwrite(thumb_path, frame)
+                    if fire_smoke_detected:
+                        detection_history.append(current_time)
+                        timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+                        thumb_filename = f"{timestamp.replace(':', '-')}.jpg"
+                        thumb_path = os.path.join(thumbnails_folder, thumb_filename)
+                        cv2.imwrite(thumb_path, frame)
 
-                    detection_records.append({
-                        "status": detected_label,
-                        "timestamp": timestamp,
-                        "thumbnail": thumb_path
-                    })
+                        detection_records.append({
+                            "status": detected_label,
+                            "timestamp": timestamp,
+                            "thumbnail": thumb_filename
+                        })
 
-                    print(f" Detected {detected_label} at {timestamp}")
+                        print(f"Detected {detected_label} at {timestamp}")
 
-                # Clean old detections >10 seconds
-                while detection_history and current_time - detection_history[0] > 10:
-                    detection_history.popleft()
+                    while detection_history and current_time - detection_history[0] > 10:
+                        detection_history.popleft()
 
-                # Alert Trigger
-                if len(detection_history) >= 3:
-                    print(" ALERT! Detected 3 times in 10 seconds!")
-                    cooldown_until = current_time + 30  # 30s pause
-                    detection_history.clear()
+                    if len(detection_history) >= 3:
+                        last3 = list(detection_history)[-3:]
+                        seconds = [int(t) for t in last3]
 
-                last_detection_time = current_time
-            resized_frame = cv2.resize(frame, (640, 360))  # or (480, 270) or any small size
-            cv2.imshow('Fire Detection', resized_frame)
+                        if seconds[1] == seconds[0] + 1 and seconds[2] == seconds[1] + 1:
+                            print("Detected fire/smoke for 3 consecutive seconds")
 
-        # Save JSON every minute
-        if current_time - last_json_save_time >= 60:
-            with open(detections_json, 'w') as f:
-                json.dump(detection_records, f, indent=2)
-            print(f" Detections saved to {detections_json}")
-            last_json_save_time = current_time
+                            if os.path.exists(detections_json):
+                                with open(detections_json, 'r') as f:
+                                    existing = json.load(f)
+                                    if not isinstance(existing, list):
+                                        existing = []
+                            else:
+                                existing = []
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+                            existing.append(detection_records[-1])
 
-except KeyboardInterrupt:
-    print("Stopped by user.")
+                            with open(detections_json, 'w') as f:
+                                json.dump(existing, f, indent=2)
 
-finally:
-    cap.release()
-    cv2.destroyAllWindows()
-    # Final save
-    with open(detections_json, 'w') as f:
-        json.dump(detection_records, f, indent=2)
-    print(f" Final detections saved to {detections_json}")
+                            print(f"Saved to {detections_json}")
+                            cooldown_until = current_time + 30
+                            detection_history.clear()
+
+                    last_detection_time = current_time
+
+                resized_frame = cv2.resize(frame, (600, 300))
+                cv2.imshow('Fire Detection', resized_frame)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    except KeyboardInterrupt:
+        print("Interrupted by user.")
+
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+
+        with open(detections_json, 'w') as f:
+            json.dump(detection_records, f, indent=2)
+        print(f"Final detections saved to {detections_json}")
+
+
+if __name__ == "__main__":
+    ai_worker()

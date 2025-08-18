@@ -6,7 +6,7 @@ from collections import deque
 from ultralytics import YOLO
 
 
-video_path = 'sample_video.mp4'
+video_path = 'combined.mp4'
 detections_json = 'detections.json'
 thumbnails_folder = 'thumbnails'
 os.makedirs(thumbnails_folder, exist_ok=True)

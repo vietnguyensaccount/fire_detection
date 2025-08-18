@@ -1,0 +1,54 @@
+{
+  "cameras": [
+    {
+      "id": "4",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "5",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "6",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "7",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "8",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "9",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "9",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "9",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "9",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    },
+    {
+      "id": "10",
+      "rtsp": "rtsp://localhost:8554/other",
+      "status": "stopped"
+    }
+  ]
+}
