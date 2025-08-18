@@ -84,7 +84,11 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <h2>🔥 Fire AI</h2>
+<<<<<<< HEAD
     <a href="/">Dashboard</a>
+=======
+    <a href="/dashboard">Dashboard</a>
+>>>>>>> 4dcef577bcf53bf93b891083fa9c08e523d57fa7
     <a href="/camera">Cameras</a>
     <a href="/events">Events</a>
     <a href="/logout">Logout</a>
@@ -93,6 +97,26 @@
   <!-- Main Content -->
   <div class="main-content">
     <h2>Welcome, {{ session['username'] }}</h2>
+<<<<<<< HEAD
+=======
+
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Timestamp</th>
+        <th>Thumbnail</th>
+      </tr>
+      {% for item in detections %}
+      <tr>
+        <td>{{ item.status }}</td>
+        <td>{{ item.timestamp }}</td>
+        <td>
+          <img src="/thumbnails/{{ item.thumbnail }}" alt="Thumbnail">
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+>>>>>>> 4dcef577bcf53bf93b891083fa9c08e523d57fa7
   </div>
 
 </body>
