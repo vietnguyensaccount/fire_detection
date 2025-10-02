@@ -1,0 +1,10 @@
+{
+  "cameras": [
+  	{"id":1,
+  	"status":"running",
+  	"rtsp":"rtsp://127.0.0.1:8554/stream1"},
+  	{"id":2,
+  	"status":"running",
+  	"rtsp":"rtsp://127.0.0.1:8554/stream2"}
+  ]
+}
