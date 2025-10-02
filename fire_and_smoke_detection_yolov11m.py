@@ -5,12 +5,7 @@ import os
 from collections import deque
 from ultralytics import YOLO
 
-<<<<<<< HEAD
-
 video_path = 'combined.mp4'
-=======
-video_path = 'rtsp://localhost:8554/other'
->>>>>>> 4dcef577bcf53bf93b891083fa9c08e523d57fa7
 detections_json = 'detections.json'
 thumbnails_folder = 'thumbnails'
 os.makedirs(thumbnails_folder, exist_ok=True)
@@ -40,7 +35,8 @@ try:
         current_time = time.time()
 
         if current_time < cooldown_until:
-            cv2.imshow('Fire Detection (Cooldown)', frame)
+            resized_frame = cv2.resize(frame,(600,300))
+            cv2.imshow('Fire Cooldown', resized_frame)
         else:
             # Detect once every second
             if current_time - last_detection_time >= 1:

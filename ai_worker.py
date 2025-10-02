@@ -1,76 +1,104 @@
-# ai_worker.py
 import cv2
 import time
-import sys
 import json
 import os
 from collections import deque
 from ultralytics import YOLO
-import cv2
 
-rtsp_url = sys.argv[2]
-cap = cv2.VideoCapture(0 if rtsp_url == "0" else rtsp_url)
+# Load model once
 model_path = "yolov11m.pt"
 model = YOLO(model_path)
 
-os.makedirs("images", exist_ok=True)
+# File paths
+cams_file = "camera_config.json"
 detections_json = "detections.json"
-history = deque()
-cooldown_until = 0
-last_detect_time = 0
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+# Read all cameras
+if os.path.exists(cams_file):
+    with open(cams_file, 'r') as f:
+        cams_data = json.load(f)
+    cameras = cams_data.get("cameras", [])
+else:
+    cameras = []
 
+# Check status
+cameras = [c for c in cameras if c.get("status") == "running"]
+
+# Open all RTSP streams
+caps = []
+for cam in cameras:
+    rtsp_url = cam["rtsp"]
+    cap = cv2.VideoCapture(0 if rtsp_url == "0" else rtsp_url)
+    caps.append((cam["id"], cap, deque(), 0, 0))  # (id, cap, history, cooldown_until, last_detect_time)
+
+print(f"Started AI worker on {len(caps)} cameras")
+
+while True:
     now = time.time()
-    if now < cooldown_until:
-        continue
+    for idx, (cid, cap, history, cooldown_until, last_detect_time) in enumerate(caps):
+        ret, frame = cap.read()
+        if not ret:
+            continue
 
-    if now - last_detect_time >= 1:
-        results = model(frame, verbose=False)
-        boxes = results[0].boxes
-        labels = results[0].names
+        # cooldown
+        if now < cooldown_until:
+            continue
 
-        fire_detected = False
-        label = None
+        if now - last_detect_time >= 3:
+            count = 0
+            results = model(frame, verbose=False)
+            boxes = results[0].boxes
+            labels = results[0].names
 
-        if boxes is not None and len(boxes) > 0:
-            for box in boxes:
-                cls = int(box.cls[0])
-                label = labels[cls].lower()
-                if label in ['fire', 'smoke']:
-                    fire_detected = True
-                    break
+            fire_detected = False
+            label = None
 
-        if fire_detected:
-            history.append(now)
-            ts = time.strftime('%Y-%m-%d_%H-%M-%S')
-            img_path = f"images/{ts}.jpg"
-            cv2.imwrite(img_path, frame)
+            if boxes is not None and len(boxes) > 0:
+                for box in boxes:
+                    cls = int(box.cls[0])
+                    label = labels[cls].lower()
+                    if label in ['fire', 'smoke']:
+                        fire_detected = True
+                        break
 
-            # Update detections.json
-            record = {
-                "timestamp": ts,
-                "status": label,
-                "thumbnail": img_path
-            }
+            if fire_detected:
+                print(cid)
+                count = count + 1
+                history.append(now)
+                ts = time.strftime('%Y-%m-%d_%H-%M-%S')
+                thumb_dir = os.path.join("thumbnails", str(cid))
+                os.makedirs(thumb_dir, exist_ok=True)
+                img_path = os.path.join(thumb_dir, f"{ts}.jpg")
+                cv2.imwrite(img_path, frame)
 
-            if os.path.exists(detections_json):
-                with open(detections_json, 'r') as f:
-                    data = json.load(f)
-            else:
-                data = []
+                # Update detections.json
+                record = {
+                    "camera_id": cid,
+                    "timestamp": ts,
+                    "status": label,
+                    "thumbnail": os.path.relpath(img_path, "thumbnails")  # path relative to thumbnails
+                }
 
-            data.append(record)
-            with open(detections_json, 'w') as f:
-                json.dump(data, f, indent=2)
+                if os.path.exists(detections_json):
+                    with open(detections_json, 'r') as f:
+                        data = json.load(f)
+                else:
+                    data = []
 
-        # Alert trigger
-        history = deque([t for t in history if now - t < 10])
-        if len(history) >= 3:
-            cooldown_until = now + 30
-            history.clear()
+                if count % 3 == 0:
+                    data.append(record)
 
-        last_detect_time = now
+                with open(detections_json, 'w') as f:
+                    json.dump(data, f, indent=2)
+
+            # Alert trigger
+            history = deque([t for t in history if now - t < 10])
+            if len(history) >= 3:
+                cooldown_until = now + 30
+                history.clear()
+
+            last_detect_time = now
+
+        # update tuple
+        caps[idx] = (cid, cap, history, cooldown_until, last_detect_time)
+

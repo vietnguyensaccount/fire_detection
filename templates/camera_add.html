@@ -85,7 +85,7 @@
 <body>
 
     <div class="sidebar">
-        <h2>🔥 Fire AI</h2>
+        <h2>Fire AI</h2>
         <a href="/events">Events</a>
         <a href="/camera">Cameras</a>
         <a href="/logout">Logout</a>
@@ -94,10 +94,13 @@
     <div class="main-content">
         <h2>Add Camera</h2>
         <form method="POST" action="/camera/add">
-
+	    
+	    <label for="id">ID</label>
+            <input type="text" id="id" name="id" placeholder="1" required>
+	    
             <label for="rtsp">RTSP URL</label>
             <input type="text" id="rtsp" name="rtsp" placeholder="rtsp://user:pass@ip:port/stream" required>
-
+		
             <input type="submit" value="Add Camera">
         </form>
     </div>
